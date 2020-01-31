@@ -11,7 +11,7 @@ import math
 import sys
 import argparse
 
-from alt_param import *
+from multi_param import *
 
 '''
 
@@ -39,20 +39,22 @@ nest.SetKernelStatus({"grng_seed": msd+N_vp})
 nest.SetKernelStatus({"rng_seeds" : range(msd+N_vp+1, msd+2*N_vp+1)})
 
 
-nest.CopyModel('iaf_cond_alpha','pyr', Pyr_params) 
-nest.CopyModel('iaf_cond_alpha','pv', PV_params)
+nest.CopyModel('iaf_psc_exp_multisynapse','pyr', Pyr_params) 
+nest.CopyModel('iaf_psc_exp_multisynapse','pv', PV_params)
+nest.CopyModel('iaf_psc_exp_multisynapse','sst', SST_params)
+nest.CopyModel('iaf_psc_exp_multisynapse','vip', VIP_params)
 
 
-celltypes=['pyr','pv']
-receptors={'pyr':1,'pv':2} #Make sure they are correct synaptic ports/receptor types
+celltypes=['pyr','pv','sst','vip']
+receptors={'pyr':1,'pv':2,'sst':3,'vip':4} #Make sure they are correct synaptic ports/receptor types
 for xin in celltypes:
 	ModelName='From'+xin
-	nest.CopyModel('static_synapse',ModelName) # this class does not have syanpse port
+	nest.CopyModel('static_synapse',ModelName,{"receptor_type":receptors[xin]})
 
 
-nest.CopyModel('stdp_synapse','IC')
+nest.CopyModel('stdp_synapse','IC',{"receptor_type":1})
 
-p_rate=200.0
+p_rate=500.0
 
 
 
@@ -62,9 +64,9 @@ LGN_nonpref_rate=p_rate*fraction
 LGN_bg_rate=0.0
 
 
-populations=['V1_1','V1_2','LM']
+populations=['V1_1','V1_2','V2_1','V2_2','LM'] # two low areas (V1 and V2), each of which includes 2 populations. 
 layers=['l23','l4']
-celltypes=['pyr','pv']
+celltypes=['pyr','pv','sst','vip']
 All_cells=defaultdict(list)
 external_list=defaultdict(list)
 sd_list=defaultdict(list)
@@ -75,7 +77,7 @@ for xin in layers:
         alltypes.append(xin+yin)
 
 
-#mm=nest.Create('multimeter', params={'record_from': ['I_syn_1','I_syn_2'],'to_accumulator':True})
+mm=nest.Create('multimeter', params={'record_from': ['I_syn_1','I_syn_2','I_syn_3','I_syn_4'],'to_accumulator':True})
 
 
 
@@ -97,7 +99,7 @@ for xin in populations:
             temp_sd=nest.Create('spike_detector',1,{"label":key1, "withtime":True,"withgid":True,"to_file": False})
             sd_list[key1].append(temp_sd)
             conn_dict = {'rule': 'all_to_all'}
-            syn_dict={'model':'Frompyr','weight':10.0,'delay':1.0} #50,
+            syn_dict={'model':'Frompyr','weight':100,'delay':1.0} #50,
             nest.Connect(temp_d,temp,conn_spec=conn_dict,syn_spec=syn_dict)
             nest.Connect(temp,temp_sd)
 
@@ -130,14 +132,65 @@ for xin in populations:
             pair=yin[pre_i:]+'_'+zin[post_i:] #pyr_pyr
             #print pair, yin[:1], pre_i
             key_layers=yin[:pre_i]+'_'+zin[:post_i] #l23_l23
-            if conn_keys in exception:
-                wv=exception[conn_keys]
-            else:
-                wv=weights[pair]
+            if pair in P_conn[key_layers]:
+                if conn_keys in exception:
+                    wv=exception[conn_keys]
+                else:
+                    wv=weights[pair]
                
-            conn_dict={'rule':'pairwise_bernoulli','p':P_conn[key_layers][pair]}
-            syn_dict={'model':'From'+yin[pre_i:],'weight':wv,'delay':1.0}
-            nest.Connect(source_list,target_list,conn_spec=conn_dict, syn_spec=syn_dict)
+                conn_dict={'rule':'pairwise_bernoulli','p':P_conn[key_layers][pair]}
+                syn_dict={'model':'From'+yin[pre_i:],'weight':wv,'delay':1.0}
+                nest.Connect(source_list,target_list,conn_spec=conn_dict, syn_spec=syn_dict)
+
+# Let's implement lateral inhibition across two population in the same area
+
+
+lateral_conn_pr=0.05
+lateral_conn_w=10.0
+#V1_1-V1_2
+conn_dict={'rule':'pairwise_bernoulli','p':lateral_conn_pr}
+syn_dict={'model':'Frompyr','weight':lateral_conn_w,'delay':1.0}
+
+
+source_list=All_cells['V1_1l23pyr'][0]
+target_list=All_cells['V1_2l23sst'][0]
+nest.Connect(list(source_list),list(target_list),conn_spec=conn_dict, syn_spec=syn_dict)
+source_list=All_cells['V1_2l23pyr'][0]
+target_list=All_cells['V1_1l23sst'][0]
+nest.Connect(list(source_list),list(target_list),conn_spec=conn_dict, syn_spec=syn_dict)
+
+#V2_1-V1_2
+
+source_list=All_cells['V2_1l23pyr'][0]
+target_list=All_cells['V2_2l23sst'][0]
+nest.Connect(list(source_list),list(target_list),conn_spec=conn_dict, syn_spec=syn_dict)
+source_list=All_cells['V2_2l23pyr'][0]
+target_list=All_cells['V2_1l23sst'][0]
+nest.Connect(list(source_list),list(target_list),conn_spec=conn_dict, syn_spec=syn_dict)
+
+
+lateral_conn_pr=0.05
+lateral_conn_w=10.0
+#V1_1-V1_2
+conn_dict={'rule':'pairwise_bernoulli','p':lateral_conn_pr}
+syn_dict={'model':'Frompyr','weight':lateral_conn_w,'delay':1.0}
+
+
+source_list=All_cells['V1_1l23pyr'][0]
+target_list=All_cells['V1_2l23pyr'][0]
+nest.Connect(list(source_list),list(target_list),conn_spec=conn_dict, syn_spec=syn_dict)
+source_list=All_cells['V1_2l23pyr'][0]
+target_list=All_cells['V1_1l23pyr'][0]
+nest.Connect(list(source_list),list(target_list),conn_spec=conn_dict, syn_spec=syn_dict)
+
+#V2_1-V1_2
+
+source_list=All_cells['V2_1l23pyr'][0]
+target_list=All_cells['V2_2l23pyr'][0]
+nest.Connect(list(source_list),list(target_list),conn_spec=conn_dict, syn_spec=syn_dict)
+source_list=All_cells['V2_2l23pyr'][0]
+target_list=All_cells['V2_1l23pyr'][0]
+nest.Connect(list(source_list),list(target_list),conn_spec=conn_dict, syn_spec=syn_dict)
 
 
 
@@ -150,7 +203,7 @@ conn_dict={'rule':'pairwise_bernoulli','p':P_pref_pref_pyr}
 syn_dict={'model':'IC','weight':w_bu_pyr,'delay':IC_delay}
 
 
-#bottom-up: pref_pref
+#bottom-up: pref_LM
 source_list=All_cells['V1_1l23pyr'][0]
 target_list=All_cells['LMl4pyr'][0]
 nest.Connect(list(source_list),list(target_list),conn_spec=conn_dict, syn_spec=syn_dict)
@@ -161,17 +214,47 @@ source_list=All_cells['V1_1l23pyr'][0]
 target_list=All_cells['LMl4pv'][0]
 nest.Connect(source_list,target_list,conn_spec=conn_dict, syn_spec=syn_dict)
 
-#bottom-up: nonpref-pref
+#bottom-up: nonpref-LM
 
-conn_dict={'rule':'pairwise_bernoulli','p':P_pref_pref_pyr}
+
+reduction_factor=0.5
+conn_dict={'rule':'pairwise_bernoulli','p':P_pref_pref_pyr*reduction_factor}
 syn_dict={'model':'IC','weight':w_bu_pyr,'delay':IC_delay}
 source_list=All_cells['V1_2l23pyr'][0]
 target_list=All_cells['LMl4pyr'][0]
 nest.Connect(list(source_list),list(target_list),conn_spec=conn_dict, syn_spec=syn_dict)
 
-conn_dict={'rule':'pairwise_bernoulli','p':P_pref_pref_pv}
+conn_dict={'rule':'pairwise_bernoulli','p':P_pref_pref_pv*reduction_factor}
 syn_dict={'model':'IC','weight':w_bu_pv,'delay':IC_delay}
 source_list=All_cells['V1_2l23pyr'][0]
+target_list=All_cells['LMl4pv'][0]
+nest.Connect(list(source_list),list(target_list),conn_spec=conn_dict, syn_spec=syn_dict)
+
+#bottom-up: V2_1-LM
+
+conn_dict={'rule':'pairwise_bernoulli','p':P_pref_pref_pyr*reduction_factor}
+syn_dict={'model':'IC','weight':w_bu_pyr,'delay':IC_delay}
+source_list=All_cells['V2_1l23pyr'][0]
+target_list=All_cells['LMl4pyr'][0]
+nest.Connect(list(source_list),list(target_list),conn_spec=conn_dict, syn_spec=syn_dict)
+
+conn_dict={'rule':'pairwise_bernoulli','p':P_pref_pref_pv*reduction_factor}
+syn_dict={'model':'IC','weight':w_bu_pv,'delay':IC_delay}
+source_list=All_cells['V2_1l23pyr'][0]
+target_list=All_cells['LMl4pv'][0]
+nest.Connect(list(source_list),list(target_list),conn_spec=conn_dict, syn_spec=syn_dict)
+
+#bottom-up: V2_2-LM
+
+conn_dict={'rule':'pairwise_bernoulli','p':P_pref_pref_pyr}
+syn_dict={'model':'IC','weight':w_bu_pyr,'delay':IC_delay}
+source_list=All_cells['V2_2l23pyr'][0]
+target_list=All_cells['LMl4pyr'][0]
+nest.Connect(list(source_list),list(target_list),conn_spec=conn_dict, syn_spec=syn_dict)
+
+conn_dict={'rule':'pairwise_bernoulli','p':P_pref_pref_pv}
+syn_dict={'model':'IC','weight':w_bu_pv,'delay':IC_delay}
+source_list=All_cells['V2_2l23pyr'][0]
 target_list=All_cells['LMl4pv'][0]
 nest.Connect(list(source_list),list(target_list),conn_spec=conn_dict, syn_spec=syn_dict)
 
@@ -181,22 +264,28 @@ nest.Connect(list(source_list),list(target_list),conn_spec=conn_dict, syn_spec=s
 
 
 
-#top-down targeting layer 2/3
 
-conn_dict={'rule':'pairwise_bernoulli','p':0.05}
+
+#top-down targeting layer 2/3 # Now, it is 
+
+conn_dict={'rule':'pairwise_bernoulli','p':0.3}
 syn_dict={'model':'Frompyr','weight':td_super_pyr,'delay':IC_delay}
 target_list=[]
 source_list=All_cells['LMl23pyr'][0]
 target_list.extend(All_cells['V1_1l23pyr'][0])
 target_list.extend(All_cells['V1_2l23pyr'][0])
+target_list.extend(All_cells['V2_1l23pyr'][0])
+target_list.extend(All_cells['V2_2l23pyr'][0])
 nest.Connect(list(source_list),list(target_list),conn_spec=conn_dict, syn_spec=syn_dict)
 
-conn_dict={'rule':'pairwise_bernoulli','p':0.05}
+conn_dict={'rule':'pairwise_bernoulli','p':0.3}
 syn_dict={'model':'Frompyr','weight':td_super_pv,'delay':IC_delay}
 target_list=[]
 source_list=All_cells['LMl23pyr'][0]
 target_list.extend(All_cells['V1_1l23pv'][0])
 target_list.extend(All_cells['V1_2l23pv'][0])
+target_list.extend(All_cells['V2_1l23pv'][0])
+target_list.extend(All_cells['V2_2l23pv'][0])
 nest.Connect(list(source_list),list(target_list),conn_spec=conn_dict, syn_spec=syn_dict)
 
 
@@ -205,8 +294,8 @@ nest.Connect(list(source_list),list(target_list),conn_spec=conn_dict, syn_spec=s
 
 
 # connect to multimeter
-#source_list=All_cells['V1_1l23pyr'][0]
-#nest.Connect(mm,source_list)
+source_list=All_cells['V1_1l23pyr'][0]
+nest.Connect(mm,source_list)
 
 
 
@@ -218,26 +307,37 @@ nonpref_lgn=nest.Create('poisson_generator',1,{'rate':LGN_nonpref_rate})
 # to pyr
 target_list1=All_cells['V1_1l4pyr'][0]
 target_list2=All_cells['V1_2l4pyr'][0]
+target_list3=All_cells['V2_1l4pyr'][0]
+target_list4=All_cells['V2_2l4pyr'][0]
 conn_dict={'rule':'pairwise_bernoulli','p':0.3}
 syn_dict={'model':'Frompyr','weight':w_lgn_pyr,'delay':1.0}
 nest.Connect(pref_lgn,list(target_list1),conn_spec=conn_dict, syn_spec=syn_dict)
 nest.Connect(nonpref_lgn,list(target_list2),conn_spec=conn_dict, syn_spec=syn_dict)
+nest.Connect(nonpref_lgn,list(target_list3),conn_spec=conn_dict, syn_spec=syn_dict)
+nest.Connect(nonpref_lgn,list(target_list4),conn_spec=conn_dict, syn_spec=syn_dict)
 
 # to pv
 target_list1=All_cells['V1_1l4pv'][0]
 target_list2=All_cells['V1_2l4pv'][0]
+target_list3=All_cells['V2_1l4pv'][0]
+target_list4=All_cells['V2_2l4pv'][0]
 conn_dict={'rule':'pairwise_bernoulli','p':0.3}
 syn_dict={'model':'Frompyr','weight':w_lgn_pv,'delay':1.0}
+nest.Connect(pref_lgn,list(target_list1),conn_spec=conn_dict, syn_spec=syn_dict)
+nest.Connect(nonpref_lgn,list(target_list2),conn_spec=conn_dict, syn_spec=syn_dict)
 nest.Connect(pref_lgn,list(target_list1),conn_spec=conn_dict, syn_spec=syn_dict)
 nest.Connect(nonpref_lgn,list(target_list2),conn_spec=conn_dict, syn_spec=syn_dict)
 
 source_list1=list(All_cells['V1_1l23pyr'][0])
 source_list2=list(All_cells['V1_2l23pyr'][0])
+source_list3=list(All_cells['V2_1l23pyr'][0])
+source_list4=list(All_cells['V2_2l23pyr'][0])
 target_list=list(All_cells['LMl4pyr'][0])
 
 pref_pref_bu=nest.GetConnections(source_list1,target_list)
 nonpref_pref_bu=nest.GetConnections(source_list2,target_list)
-
+V2_1_bu=nest.GetConnections(source_list3,target_list)
+V2_2_bu=nest.GetConnections(source_list4,target_list)
 
 
 #print pref_pref_bu
@@ -246,51 +346,78 @@ weights={}
 
 pref_pref_bu_weight=nest.GetStatus(pref_pref_bu)
 nonpref_pref_bu_weight=nest.GetStatus(nonpref_pref_bu)
+V2_1_bu_weight=nest.GetStatus(V2_1_bu)
+V2_2_bu_weight=nest.GetStatus(V2_2_bu)
+
 p_p=[]
 np_p=[]
+V2_1=[]
+V2_2=[]
 for xin in pref_pref_bu_weight:
     p_p.append(xin['weight'])
 for xin in nonpref_pref_bu_weight:
     np_p.append(xin['weight'])
+for xin in V2_1_bu_weight:
+    V2_1.append(xin['weight'])
+for xin in V2_2_bu_weight:
+    V2_2.append(xin['weight'])
 
 
 print 'initial weights'
 print 'pref_pref', numpy.mean(numpy.array(p_p))
 print 'nonpref_pref', numpy.mean(numpy.array(np_p))
+print 'V2_1', numpy.mean(numpy.array(V2_1))
+print 'V2_2', numpy.mean(numpy.array(V2_2))
 
 weights['before_p_p']=p_p
 weights['before_np_p']=np_p
-
+weights['before_V2_1']=V2_1
+weights['before_V2_2']=V2_2
 
 
 nest.Simulate(simtime)
 
 source_list1=list(All_cells['V1_1l23pyr'][0])
 source_list2=list(All_cells['V1_2l23pyr'][0])
+source_list3=list(All_cells['V2_1l23pyr'][0])
+source_list4=list(All_cells['V2_2l23pyr'][0])
 target_list=list(All_cells['LMl4pyr'][0])
 
-pref_pref_bu=nest.GetConnections(source_list1,target_list)
-nonpref_pref_bu=nest.GetConnections(source_list2,target_list)
 pref_pref_bu_weight=nest.GetStatus(pref_pref_bu)
 nonpref_pref_bu_weight=nest.GetStatus(nonpref_pref_bu)
+V2_1_bu_weight=nest.GetStatus(V2_1_bu)
+V2_2_bu_weight=nest.GetStatus(V2_2_bu)
 
 p_p=[]
 np_p=[]
+V2_1=[]
+V2_2=[]
 for xin in pref_pref_bu_weight:
     p_p.append(xin['weight'])
 for xin in nonpref_pref_bu_weight:
     np_p.append(xin['weight'])
+for xin in V2_1_bu_weight:
+    V2_1.append(xin['weight'])
+for xin in V2_2_bu_weight:
+    V2_2.append(xin['weight'])
+
 
 print 'updated weights'
 print 'pref_pref', numpy.mean(numpy.array(p_p))
 print 'nonpref_pref', numpy.mean(numpy.array(np_p))
+print 'V2_1', numpy.mean(numpy.array(V2_1))
+print 'V2_2', numpy.mean(numpy.array(V2_2))
 
 weights['after_p_p']=p_p
 weights['after_np_p']=np_p
+weights['after_V2_1']=V2_1
+weights['after_V2_2']=V2_2
 
 
 
-colors={'pyr':'r','pv':'b'}
+
+
+colors={'pyr':'r','pv':'b','sst':'g','vip':'k'}
 
 spikes={}
 for xin in populations:
@@ -313,18 +440,21 @@ for xin in populations:
 
 
 # now plot the lfp
-#events = nest.GetStatus()[0]['events']
+events = nest.GetStatus(mm)[0]['events']
 
 #print events, len(events)
 
-#t = events['times']
-#i1=events['I_syn_1']
-#i2=events['I_syn_2']
+t = events['times']
+i1=events['I_syn_1']
+i2=events['I_syn_2']
+i3=events['I_syn_3']
+i4=events['I_syn_4']
 
-#lfp={}
-#lfp_raw=numpy.abs(i1)+numpy.abs(i2)
-#lfp['time']=list(t)
-#lfp['lfp']=list(lfp_raw) # no vip cells
+
+lfp={}
+lfp_raw=numpy.abs(i1)+numpy.abs(i2)+numpy.abs(i3)+numpy.abs(i4)
+lfp['time']=list(t)
+lfp['lfp']=list(lfp_raw) # no vip cells
 
 
 if show_graph:
@@ -358,18 +488,46 @@ if show_graph:
     for xi, xin in enumerate(layers):
         pylab.subplot(sub_fig_num,1,xi+1)
         if xi==0:
+            pylab.title('V2_1')
+        for yin in celltypes:
+            spks=spikes['V2_1'+xin+yin]
+            pylab.scatter(spks[0],spks[1],c=colors[yin], s=5, edgecolors='none')
+            pylab.xlim([0.0,simtime])
+        pylab.ylabel(xin)
+
+    pylab.figure(4)
+
+    for xi, xin in enumerate(layers):
+        pylab.subplot(sub_fig_num,1,xi+1)
+        if xi==0:
+            pylab.title('V2_2')
+        for yin in celltypes:
+            spks=spikes['V2_2'+xin+yin]
+            pylab.scatter(spks[0],spks[1],c=colors[yin], s=5, edgecolors='none')
+            pylab.xlim([0.0,simtime])
+        pylab.ylabel(xin)
+
+    pylab.figure(5)
+
+    for xi, xin in enumerate(layers):
+        pylab.subplot(sub_fig_num,1,xi+1)
+        if xi==0:
             pylab.title('LM')
         for yin in celltypes:
             spks=spikes['LM'+xin+yin]
             pylab.scatter(spks[0],spks[1],c=colors[yin], s=5, edgecolors='none')
             pylab.xlim([0.0,simtime])
         pylab.ylabel(xin)
+
+    pylab.figure(6)
+    pylab.plot(t,lfp_raw)
+
     pylab.show()
 
 
 sim_len=str(int(simtime))
 
-fn_comm=str(top_down_pyr)+'_'+str(top_down_pv)+'_'+str(msd)+'_'+str(fraction)+'_'+sim_len+'.json'
+fn_comm='multi'+str(top_down_pyr)+'_'+str(top_down_pv)+'_'+str(msd)+'_'+str(fraction)+'_'+sim_len+'.json'
 
 
 
@@ -381,6 +539,9 @@ fp=open('weights_'+fn_comm,'w')
 json.dump(weights,fp)
 fp.close()
 
+fp=open('lfp_'+fn_comm,'w')
+json.dump(lfp,fp)
+fp.close()
 
         
         
