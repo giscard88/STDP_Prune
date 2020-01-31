@@ -334,8 +334,8 @@ conn_dict={'rule':'pairwise_bernoulli','p':0.3}
 syn_dict={'model':'Frompyr','weight':w_lgn_pv,'delay':1.0}
 nest.Connect(pref_lgn,list(target_list1),conn_spec=conn_dict, syn_spec=syn_dict)
 nest.Connect(nonpref_lgn,list(target_list2),conn_spec=conn_dict, syn_spec=syn_dict)
-nest.Connect(pref_lgn,list(target_list1),conn_spec=conn_dict, syn_spec=syn_dict)
-nest.Connect(nonpref_lgn,list(target_list2),conn_spec=conn_dict, syn_spec=syn_dict)
+nest.Connect(nonpref_lgn,list(target_list3),conn_spec=conn_dict, syn_spec=syn_dict)
+nest.Connect(nonpref_lgn,list(target_list4),conn_spec=conn_dict, syn_spec=syn_dict)
 
 source_list1=list(All_cells['V1_1l23pyr'][0])
 source_list2=list(All_cells['V1_2l23pyr'][0])

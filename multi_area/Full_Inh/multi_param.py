@@ -38,10 +38,19 @@ parser.add_argument("--show_graph", type=str2bool, nargs='?',
                         const=True, default=False,
                         help="Show graphs ")
 
-
-
 parser.add_argument("--second_lgn", type=float, default=0.2,
                         help="fraction of lgn input to non-preferred column (default 0.2)")
+
+
+
+
+parser.add_argument("--vip1_i", type=float, default=1.0,
+                        help="scale of input to vip (default 1.0)")
+
+
+parser.add_argument("--vip2_i", type=float, default=1.0,
+                        help="scale of input to vip (default 1.0)")
+
 
 args = parser.parse_args()
 
@@ -51,6 +60,9 @@ top_down_pv=args.top_down_pv
 simtime=args.simtime
 fraction=args.second_lgn
 show_graph=args.show_graph
+
+vip1_i=args.vip1_i
+vip2_i=args.vip2_i
 
 
 num_scale=5
@@ -69,11 +81,6 @@ vip4_num=pv4_num
 
 Neuron_nums={'l23pyr':pyr23_num,'l23pv':pv23_num,'l23sst':sst23_num,'l23vip':vip23_num,
              'l4pyr':pyr4_num,'l4pv':pv4_num,'l4sst':sst4_num,'l4vip':vip4_num}
-
-
-
-
-
 
 
 
@@ -104,8 +111,8 @@ LM_weights=V1_weights
 LM_exceptions=V1_exceptions
 
 
-Ext={'V1l23pyr':1050.0,'V1l23pv':1000.0,'V1l23sst':1450.0,'V1l23vip':1450.0,
-     'V2l23pyr':1050.0,'V2l23pv':1000.0,'V2l23sst':1450.0,'V2l23vip':1000.0,
+Ext={'V1l23pyr':1050.0,'V1l23pv':1000.0,'V1l23sst':1450.0,'V1l23vip':1450.0*vip1_i,
+     'V2l23pyr':1050.0,'V2l23pv':1000.0,'V2l23sst':1450.0,'V2l23vip':1450.0*vip2_i,
      'V1l4pyr':1050.0,'V1l4pv':1000.0, 'V1l4sst':1000.0,'V1l4vip':1000.0, 
      'V2l4pyr':1050.0,'V2l4pv':1000.0, 'V2l4sst':1000.0,'V2l4vip':1000.0, 
      'LMl23pyr':1050.0,'LMl23pv':1000.0,'LMl23sst':1000.0,'LMl23vip':1000.0,

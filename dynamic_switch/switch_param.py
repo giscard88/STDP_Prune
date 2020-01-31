@@ -39,9 +39,15 @@ parser.add_argument("--show_graph", type=str2bool, nargs='?',
                         help="Show graphs ")
 
 
-
 parser.add_argument("--second_lgn", type=float, default=0.2,
                         help="fraction of lgn input to non-preferred column (default 0.2)")
+
+parser.add_argument("--sst_i", type=float, default=1.0,
+                        help="scale of input to sst (default 1.0)")
+
+parser.add_argument("--vip_i", type=float, default=1.0,
+                        help="scale of input to vip (default 1.0)")
+
 
 args = parser.parse_args()
 
@@ -51,6 +57,8 @@ top_down_pv=args.top_down_pv
 simtime=args.simtime
 fraction=args.second_lgn
 show_graph=args.show_graph
+sst_i=args.sst_i
+vip_i=args.vip_i
 
 
 num_scale=5
@@ -104,7 +112,7 @@ LM_weights=V1_weights
 LM_exceptions=V1_exceptions
 
 
-Ext={'V1l23pyr':1050.0,'V1l23pv':1000.0,'V1l23sst':1450.0,'V1l23vip':1450.0,
+Ext={'V1l23pyr':1050.0,'V1l23pv':1000.0,'V1l23sst':1450.0*sst_i,'V1l23vip':1450.0*vip_i,
 
      'V1l4pyr':1050.0,'V1l4pv':1000.0, 'V1l4sst':1000.0,'V1l4vip':1000.0, 
 

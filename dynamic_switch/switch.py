@@ -11,7 +11,7 @@ import math
 import sys
 import argparse
 
-from multi_param import *
+from switch_param import *
 
 '''
 
@@ -412,7 +412,7 @@ if show_graph:
 
 sim_len=str(int(simtime))
 
-fn_comm='switch'+str(top_down_pyr)+'_'+str(top_down_pv)+'_'+str(msd)+'_'+str(fraction)+'_'+sim_len+'.json'
+fn_comm='switch'+str(top_down_pyr)+'_'+str(top_down_pv)+'_'+str(msd)+'_'+str(fraction)+'_'+str(sst_i)+'_'+str(vip_i)+'_'+sim_len+'.json'
 
 
 

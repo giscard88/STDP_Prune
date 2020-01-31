@@ -527,7 +527,7 @@ if show_graph:
 
 sim_len=str(int(simtime))
 
-fn_comm='multi'+str(top_down_pyr)+'_'+str(top_down_pv)+'_'+str(msd)+'_'+str(fraction)+'_'+sim_len+'.json'
+fn_comm='multi'+str(top_down_pyr)+'_'+str(top_down_pv)+'_'+str(msd)+'_'+str(fraction)+'_'+str(vip1_i)+'_'+str(vip2_i)+sim_len+'.json'
 
 
 
