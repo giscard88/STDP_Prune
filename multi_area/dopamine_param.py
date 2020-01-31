@@ -33,10 +33,14 @@ parser.add_argument("--top_down_pyr", type=float, default=1.0,
 parser.add_argument("--simtime", type=float, default=10000.0,
                         help="Simulation time (in terms of clock time) (default: 10000.0, 10 sec)")
 
+parser.add_argument("--mod_config", type=int, default=1,
+                        help="set a dopamine pool to be active (default: 1)")
+
 
 parser.add_argument("--show_graph", type=str2bool, nargs='?',
                         const=True, default=False,
                         help="Show graphs ")
+
 
 
 
@@ -51,6 +55,7 @@ top_down_pv=args.top_down_pv
 simtime=args.simtime
 fraction=args.second_lgn
 show_graph=args.show_graph
+active_pool=args.mod_config
 
 
 num_scale=5
@@ -85,7 +90,7 @@ P_l23_l23={'pyr_pyr':0.4,'pyr_pv':0.6,'pyr_sst':0.2,'pyr_vip':0.1,
            'pv_pv':1.0,'pv_pyr':1.0, 'sst_pyr':1.0,'sst_pv':0.5,'sst_vip':0.5, 'vip_sst':0.5}
 
 P_l4_l4 = {'pyr_pyr':0.4,'pyr_pv':0.6,'pyr_sst':0.3,'pyr_vip':0.1,
-           'pv_pv':1.0,'pv_pyr':1.0, 'sst_pyr':1.0,'sst_pv':0.5,'sst_vip':0.5, 'vip_sst':0.5}
+           'pv_pv':1.0,'pv_pyr':1.0, 'sst_pyr':1.0,'sst_pv':1.0,'sst_vip':0.5, 'vip_sst':0.5}
 
 #across later
 P_l23_l4={'pyr_pyr':0.0,'pyr_pv':0.0,'pv_pv':0.0,'pv_pyr':0.0}
@@ -104,8 +109,8 @@ LM_weights=V1_weights
 LM_exceptions=V1_exceptions
 
 
-Ext={'V1l23pyr':1050.0,'V1l23pv':1000.0,'V1l23sst':1450.0,'V1l23vip':1450.0,
-     'V2l23pyr':1050.0,'V2l23pv':1000.0,'V2l23sst':1450.0,'V2l23vip':1000.0,
+Ext={'V1l23pyr':1050.0,'V1l23pv':1000.0,'V1l23sst':1300.0,'V1l23vip':1400.0,
+     'V2l23pyr':1050.0,'V2l23pv':1000.0,'V2l23sst':1300.0,'V2l23vip':1000.0,
      'V1l4pyr':1050.0,'V1l4pv':1000.0, 'V1l4sst':1000.0,'V1l4vip':1000.0, 
      'V2l4pyr':1050.0,'V2l4pv':1000.0, 'V2l4sst':1000.0,'V2l4vip':1000.0, 
      'LMl23pyr':1050.0,'LMl23pv':1000.0,'LMl23sst':1000.0,'LMl23vip':1000.0,

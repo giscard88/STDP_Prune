@@ -11,7 +11,7 @@ import math
 import sys
 import argparse
 
-from multi_param import *
+from dopamine_param import *
 
 '''
 
@@ -45,14 +45,14 @@ nest.CopyModel('iaf_psc_exp_multisynapse','sst', SST_params)
 nest.CopyModel('iaf_psc_exp_multisynapse','vip', VIP_params)
 
 
-celltypes=['pyr','pv','sst','vip']
+celltypes=['pyr','pv']
 receptors={'pyr':1,'pv':2,'sst':3,'vip':4} #Make sure they are correct synaptic ports/receptor types
 for xin in celltypes:
 	ModelName='From'+xin
 	nest.CopyModel('static_synapse',ModelName,{"receptor_type":receptors[xin]})
 
 
-nest.CopyModel('stdp_synapse','IC',{"receptor_type":1})
+
 
 p_rate=500.0
 
@@ -66,7 +66,7 @@ LGN_bg_rate=0.0
 
 populations=['V1_1','V1_2','V2_1','V2_2','LM'] # two low areas (V1 and V2), each of which includes 2 populations. 
 layers=['l23','l4']
-celltypes=['pyr','pv','sst','vip']
+celltypes=['pyr','pv']
 All_cells=defaultdict(list)
 external_list=defaultdict(list)
 sd_list=defaultdict(list)
@@ -82,6 +82,36 @@ mm=nest.Create('multimeter', params={'record_from': ['I_syn_1','I_syn_2','I_syn_
 
 
 
+vol1=nest.Create('volume_transmitter')
+vol2=nest.Create('volume_transmitter')
+pool1=nest.Create('iaf_psc_exp',100)
+pool2=nest.Create('iaf_psc_exp',100)
+
+
+if active_pool==1:
+    neuro_mod1=nest.Create('poisson_generator',1,{'rate':950.0})
+    neuro_mod2=nest.Create('poisson_generator',1,{'rate':0.0})
+    ap='1'
+else:
+    neuro_mod1=nest.Create('poisson_generator',1,{'rate':0.0})
+    neuro_mod2=nest.Create('poisson_generator',1,{'rate':950.0})
+    ap='2'
+
+conn_dict = {'rule': 'all_to_all'}
+syn_dict={'weight':100.,'delay':1.0} #50,
+nest.Connect(neuro_mod1,pool1,conn_spec=conn_dict,syn_spec=syn_dict)
+nest.Connect(neuro_mod2,pool2,conn_spec=conn_dict,syn_spec=syn_dict)
+
+
+nest.Connect(pool1,vol1)
+nest.Connect(pool2,vol2)
+
+print vol1, vol2
+nest.CopyModel('stdp_dopamine_synapse','IC1',{"receptor_type":1,"vt":vol1[0]})
+nest.CopyModel('stdp_dopamine_synapse','IC2',{"receptor_type":1,"vt":vol2[0]})
+
+#sd_test=nest.Create('spike_detector',1,{"label":'pool', "withtime":True,"withgid":True,"to_file": False})
+#nest.Connect(pool1, sd_test)
 
  
 for xin in populations:
@@ -145,32 +175,11 @@ for xin in populations:
 # Let's implement lateral inhibition across two population in the same area
 
 
-lateral_conn_pr=0.05
-lateral_conn_w=10.0
-#V1_1-V1_2
-conn_dict={'rule':'pairwise_bernoulli','p':lateral_conn_pr}
-syn_dict={'model':'Frompyr','weight':lateral_conn_w,'delay':1.0}
 
 
-source_list=All_cells['V1_1l23pyr'][0]
-target_list=All_cells['V1_2l23sst'][0]
-nest.Connect(list(source_list),list(target_list),conn_spec=conn_dict, syn_spec=syn_dict)
-source_list=All_cells['V1_2l23pyr'][0]
-target_list=All_cells['V1_1l23sst'][0]
-nest.Connect(list(source_list),list(target_list),conn_spec=conn_dict, syn_spec=syn_dict)
 
-#V2_1-V1_2
-
-source_list=All_cells['V2_1l23pyr'][0]
-target_list=All_cells['V2_2l23sst'][0]
-nest.Connect(list(source_list),list(target_list),conn_spec=conn_dict, syn_spec=syn_dict)
-source_list=All_cells['V2_2l23pyr'][0]
-target_list=All_cells['V2_1l23sst'][0]
-nest.Connect(list(source_list),list(target_list),conn_spec=conn_dict, syn_spec=syn_dict)
-
-
-lateral_conn_pr=0.05
-lateral_conn_w=10.0
+lateral_conn_pr=0.0
+lateral_conn_w=0.0
 #V1_1-V1_2
 conn_dict={'rule':'pairwise_bernoulli','p':lateral_conn_pr}
 syn_dict={'model':'Frompyr','weight':lateral_conn_w,'delay':1.0}
@@ -200,32 +209,32 @@ IC_delay=5.0
 
 # IC 
 conn_dict={'rule':'pairwise_bernoulli','p':P_pref_pref_pyr}
-syn_dict={'model':'IC','weight':w_bu_pyr,'delay':IC_delay}
+syn_dict={'model':'IC1','weight':w_bu_pyr,'delay':IC_delay}
 
 
+
+reduction_factor=0.5
 #bottom-up: pref_LM
 source_list=All_cells['V1_1l23pyr'][0]
 target_list=All_cells['LMl4pyr'][0]
 nest.Connect(list(source_list),list(target_list),conn_spec=conn_dict, syn_spec=syn_dict)
 
-conn_dict={'rule':'pairwise_bernoulli','p':P_pref_pref_pv}
-syn_dict={'model':'IC','weight':w_bu_pv,'delay':IC_delay}
+conn_dict={'rule':'pairwise_bernoulli','p':P_pref_pref_pv*reduction_factor}
+syn_dict={'model':'IC1','weight':w_bu_pv,'delay':IC_delay}
 source_list=All_cells['V1_1l23pyr'][0]
 target_list=All_cells['LMl4pv'][0]
 nest.Connect(source_list,target_list,conn_spec=conn_dict, syn_spec=syn_dict)
 
 #bottom-up: nonpref-LM
 
-
-reduction_factor=0.5
 conn_dict={'rule':'pairwise_bernoulli','p':P_pref_pref_pyr*reduction_factor}
-syn_dict={'model':'IC','weight':w_bu_pyr,'delay':IC_delay}
+syn_dict={'model':'IC1','weight':w_bu_pyr,'delay':IC_delay}
 source_list=All_cells['V1_2l23pyr'][0]
 target_list=All_cells['LMl4pyr'][0]
 nest.Connect(list(source_list),list(target_list),conn_spec=conn_dict, syn_spec=syn_dict)
 
 conn_dict={'rule':'pairwise_bernoulli','p':P_pref_pref_pv*reduction_factor}
-syn_dict={'model':'IC','weight':w_bu_pv,'delay':IC_delay}
+syn_dict={'model':'IC1','weight':w_bu_pv,'delay':IC_delay}
 source_list=All_cells['V1_2l23pyr'][0]
 target_list=All_cells['LMl4pv'][0]
 nest.Connect(list(source_list),list(target_list),conn_spec=conn_dict, syn_spec=syn_dict)
@@ -233,13 +242,13 @@ nest.Connect(list(source_list),list(target_list),conn_spec=conn_dict, syn_spec=s
 #bottom-up: V2_1-LM
 
 conn_dict={'rule':'pairwise_bernoulli','p':P_pref_pref_pyr*reduction_factor}
-syn_dict={'model':'IC','weight':w_bu_pyr,'delay':IC_delay}
+syn_dict={'model':'IC2','weight':w_bu_pyr,'delay':IC_delay}
 source_list=All_cells['V2_1l23pyr'][0]
 target_list=All_cells['LMl4pyr'][0]
 nest.Connect(list(source_list),list(target_list),conn_spec=conn_dict, syn_spec=syn_dict)
 
-conn_dict={'rule':'pairwise_bernoulli','p':P_pref_pref_pv*reduction_factor}
-syn_dict={'model':'IC','weight':w_bu_pv,'delay':IC_delay}
+conn_dict={'rule':'pairwise_bernoulli','p':P_pref_pref_pv}
+syn_dict={'model':'IC2','weight':w_bu_pv,'delay':IC_delay}
 source_list=All_cells['V2_1l23pyr'][0]
 target_list=All_cells['LMl4pv'][0]
 nest.Connect(list(source_list),list(target_list),conn_spec=conn_dict, syn_spec=syn_dict)
@@ -247,13 +256,13 @@ nest.Connect(list(source_list),list(target_list),conn_spec=conn_dict, syn_spec=s
 #bottom-up: V2_2-LM
 
 conn_dict={'rule':'pairwise_bernoulli','p':P_pref_pref_pyr}
-syn_dict={'model':'IC','weight':w_bu_pyr,'delay':IC_delay}
+syn_dict={'model':'IC2','weight':w_bu_pyr,'delay':IC_delay}
 source_list=All_cells['V2_2l23pyr'][0]
 target_list=All_cells['LMl4pyr'][0]
 nest.Connect(list(source_list),list(target_list),conn_spec=conn_dict, syn_spec=syn_dict)
 
 conn_dict={'rule':'pairwise_bernoulli','p':P_pref_pref_pv}
-syn_dict={'model':'IC','weight':w_bu_pv,'delay':IC_delay}
+syn_dict={'model':'IC2','weight':w_bu_pv,'delay':IC_delay}
 source_list=All_cells['V2_2l23pyr'][0]
 target_list=All_cells['LMl4pv'][0]
 nest.Connect(list(source_list),list(target_list),conn_spec=conn_dict, syn_spec=syn_dict)
@@ -527,7 +536,7 @@ if show_graph:
 
 sim_len=str(int(simtime))
 
-fn_comm='multi'+str(top_down_pyr)+'_'+str(top_down_pv)+'_'+str(msd)+'_'+str(fraction)+'_'+sim_len+'.json'
+fn_comm='multi_dopamine-'+ap+'-'+str(top_down_pyr)+'_'+str(top_down_pv)+'_'+str(msd)+'_'+str(fraction)+'_'+sim_len+'.json'
 
 
 
@@ -543,8 +552,9 @@ fp=open('lfp_'+fn_comm,'w')
 json.dump(lfp,fp)
 fp.close()
 
-        
-        
+#events=nest.GetStatus(sd_test,'events')[0]
+#senders=events['senders']
+#print ('pool activity',len(senders))        
         
 
 
