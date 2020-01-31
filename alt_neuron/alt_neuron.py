@@ -146,7 +146,7 @@ IC_delay=5.0
 
 
 # IC 
-conn_dict={'rule':'pairwise_bernoulli','p':P_pref_pref_pyr*p_scale}
+conn_dict={'rule':'pairwise_bernoulli','p':P_pref_pref_pyr}
 syn_dict={'model':'IC','weight':w_bu_pyr,'delay':IC_delay}
 
 
@@ -155,7 +155,7 @@ source_list=All_cells['V1_1l23pyr'][0]
 target_list=All_cells['LMl4pyr'][0]
 nest.Connect(list(source_list),list(target_list),conn_spec=conn_dict, syn_spec=syn_dict)
 
-conn_dict={'rule':'pairwise_bernoulli','p':P_pref_pref_pv*p_scale}
+conn_dict={'rule':'pairwise_bernoulli','p':P_pref_pref_pv}
 syn_dict={'model':'IC','weight':w_bu_pv,'delay':IC_delay}
 source_list=All_cells['V1_1l23pyr'][0]
 target_list=All_cells['LMl4pv'][0]
@@ -163,13 +163,13 @@ nest.Connect(source_list,target_list,conn_spec=conn_dict, syn_spec=syn_dict)
 
 #bottom-up: nonpref-pref
 
-conn_dict={'rule':'pairwise_bernoulli','p':P_pref_pref_pyr*p_scale}
+conn_dict={'rule':'pairwise_bernoulli','p':P_pref_pref_pyr}
 syn_dict={'model':'IC','weight':w_bu_pyr,'delay':IC_delay}
 source_list=All_cells['V1_2l23pyr'][0]
 target_list=All_cells['LMl4pyr'][0]
 nest.Connect(list(source_list),list(target_list),conn_spec=conn_dict, syn_spec=syn_dict)
 
-conn_dict={'rule':'pairwise_bernoulli','p':P_pref_pref_pv*p_scale}
+conn_dict={'rule':'pairwise_bernoulli','p':P_pref_pref_pv}
 syn_dict={'model':'IC','weight':w_bu_pv,'delay':IC_delay}
 source_list=All_cells['V1_2l23pyr'][0]
 target_list=All_cells['LMl4pv'][0]
@@ -183,7 +183,7 @@ nest.Connect(list(source_list),list(target_list),conn_spec=conn_dict, syn_spec=s
 
 #top-down targeting layer 2/3
 
-conn_dict={'rule':'pairwise_bernoulli','p':0.3*p_scale}
+conn_dict={'rule':'pairwise_bernoulli','p':0.05}
 syn_dict={'model':'Frompyr','weight':td_super_pyr,'delay':IC_delay}
 target_list=[]
 source_list=All_cells['LMl23pyr'][0]
@@ -191,7 +191,7 @@ target_list.extend(All_cells['V1_1l23pyr'][0])
 target_list.extend(All_cells['V1_2l23pyr'][0])
 nest.Connect(list(source_list),list(target_list),conn_spec=conn_dict, syn_spec=syn_dict)
 
-conn_dict={'rule':'pairwise_bernoulli','p':0.3*p_scale}
+conn_dict={'rule':'pairwise_bernoulli','p':0.05}
 syn_dict={'model':'Frompyr','weight':td_super_pv,'delay':IC_delay}
 target_list=[]
 source_list=All_cells['LMl23pyr'][0]

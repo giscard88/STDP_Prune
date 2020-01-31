@@ -73,29 +73,29 @@ p_scale=0.5
 layers=['l23','l4']
 
 #within layer
-P_l23_l23={'pyr_pyr':0.4*p_scale,'pyr_pv':0.6*p_scale,'pv_pv':1.0,'pv_pyr':1.0}
-P_l4_l4 = {'pyr_pyr':0.4*p_scale,'pyr_pv':0.6*p_scale,'pv_pv':1.0,'pv_pyr':1.0}
+P_l23_l23={'pyr_pyr':0.1,'pyr_pv':0.4,'pv_pv':0.5,'pv_pyr':1.0}
+P_l4_l4 = {'pyr_pyr':0.1,'pyr_pv':0.4,'pv_pv':0.5,'pv_pyr':1.0}
 
 #across later
 P_l23_l4={'pyr_pyr':0.0,'pyr_pv':0.0,'pv_pv':0.0,'pv_pyr':0.0}
-P_l4_l23={'pyr_pyr':0.6*p_scale,'pyr_pv':0.4*p_scale,'pv_pv':0.0,'pv_pyr':0.0}
+P_l4_l23={'pyr_pyr':0.2,'pyr_pv':0.2,'pv_pv':0.0,'pv_pyr':0.0}
 
 
 
 P_conn={'l23_l23':P_l23_l23, 'l23_l4':P_l23_l4, 'l4_l23':P_l4_l23, 'l4_l4':P_l4_l4}
 
-V1_weights={'pyr_pyr':40.0*w_scale,'pyr_pv':40.0*w_scale,'pv_pyr':-40.0*w_scale,'pv_pv':-40.0*w_scale}
-V1_exceptions={'l4pyr_l23pyr':40.0*w_scale, 'l4pyr_l23pv':40.0*w_scale} 
+V1_weights={'pyr_pyr':5.0,'pyr_pv':15.0,'pv_pyr':-30.0,'pv_pv':-30.0}
+V1_exceptions={'l4pyr_l23pyr':15.0, 'l4pyr_l23pv':5.0} 
 
 LM_weights=V1_weights
 LM_exceptions=V1_exceptions
 
 
-Ext={'V1l23pyr':250.0,'V1l23pv':200.0,
-     'V1l4pyr':200.0,'V1l4pv':250.0, 
+Ext={'V1l23pyr':110.0,'V1l23pv':150.0,
+     'V1l4pyr':110.0,'V1l4pv':150.0, 
      
-     'LMl23pyr':250.0,'LMl23pv':200.0,
-     'LMl4pyr':200.0,'LMl4pv':250.0,
+     'LMl23pyr':110.0,'LMl23pv':150.0,
+     'LMl4pyr':110.0,'LMl4pv':150.0,
      }
 
 
@@ -104,21 +104,21 @@ Ext={'V1l23pyr':250.0,'V1l23pv':200.0,
 
 
 #probabiilty
-P_pref_pref_pyr=0.3*p_scale
-P_pref_pref_pv=0.3*p_scale
+P_pref_pref_pyr=0.1
+P_pref_pref_pv=0.1
 
 
 #lgn inputs
-w_lgn_pyr=40.0*w_scale
-w_lgn_pv=30.0*w_scale
+w_lgn_pyr=15.0
+w_lgn_pv=5.0
 
 
-w_bu_pyr=30.0*w_scale
-w_bu_pv=30.0*w_scale
+w_bu_pyr=10.0
+w_bu_pv=15.0
 
 #top-down weights
-td_super_pyr=20.0*top_down_pyr*w_scale  #15.0
-td_super_pv=25.0*top_down_pv*w_scale  #10.0
+td_super_pyr=4.0
+td_super_pv=6.0
 
 #td_deep_pv=10.0
 
@@ -126,12 +126,12 @@ td_super_pv=25.0*top_down_pv*w_scale  #10.0
 
 Pyr_params = {
             "tau_syn_ex": 0.5,
-            "tau_syn_in":6.0
+            "tau_syn_in":3.0
 	    }
 
 
 PV_params = {"tau_syn_ex": 0.5,
-            "tau_syn_in":4.3
+            "tau_syn_in":3.0
 
            }
 
