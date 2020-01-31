@@ -73,18 +73,18 @@ p_scale=0.5
 layers=['l23','l4']
 
 #within layer
-P_l23_l23={'pyr_pyr':0.1,'pyr_pv':0.4,'pv_pv':0.5,'pv_pyr':1.0}
-P_l4_l4 = {'pyr_pyr':0.1,'pyr_pv':0.4,'pv_pv':0.5,'pv_pyr':1.0}
+P_l23_l23={'pyr_pyr':0.1,'pyr_pv':0.5,'pv_pv':0.5,'pv_pyr':1.0}
+P_l4_l4 = {'pyr_pyr':0.1,'pyr_pv':0.5,'pv_pv':0.5,'pv_pyr':1.0}
 
 #across later
 P_l23_l4={'pyr_pyr':0.0,'pyr_pv':0.0,'pv_pv':0.0,'pv_pyr':0.0}
-P_l4_l23={'pyr_pyr':0.2,'pyr_pv':0.2,'pv_pv':0.0,'pv_pyr':0.0}
+P_l4_l23={'pyr_pyr':0.3,'pyr_pv':0.2,'pv_pv':0.0,'pv_pyr':0.0}
 
 
 
 P_conn={'l23_l23':P_l23_l23, 'l23_l4':P_l23_l4, 'l4_l23':P_l4_l23, 'l4_l4':P_l4_l4}
 
-V1_weights={'pyr_pyr':5.0,'pyr_pv':15.0,'pv_pyr':-30.0,'pv_pv':-30.0}
+V1_weights={'pyr_pyr':5.0,'pyr_pv':10.0,'pv_pyr':-30.0,'pv_pv':-20.0}
 V1_exceptions={'l4pyr_l23pyr':15.0, 'l4pyr_l23pv':5.0} 
 
 LM_weights=V1_weights
@@ -104,8 +104,8 @@ Ext={'V1l23pyr':110.0,'V1l23pv':150.0,
 
 
 #probabiilty
-P_pref_pref_pyr=0.1
-P_pref_pref_pv=0.1
+P_pref_pref_pyr=0.05
+P_pref_pref_pv=0.05
 
 
 #lgn inputs
@@ -117,8 +117,8 @@ w_bu_pyr=10.0
 w_bu_pv=15.0
 
 #top-down weights
-td_super_pyr=4.0
-td_super_pv=6.0
+td_super_pyr=12.0
+td_super_pv=18.0
 
 #td_deep_pv=10.0
 
