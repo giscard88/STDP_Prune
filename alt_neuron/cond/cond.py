@@ -52,7 +52,7 @@ for xin in celltypes:
 
 nest.CopyModel('stdp_synapse','IC')
 
-p_rate=200.0
+p_rate=500.0
 
 
 
@@ -97,7 +97,7 @@ for xin in populations:
             temp_sd=nest.Create('spike_detector',1,{"label":key1, "withtime":True,"withgid":True,"to_file": False})
             sd_list[key1].append(temp_sd)
             conn_dict = {'rule': 'all_to_all'}
-            syn_dict={'model':'Frompyr','weight':10.0,'delay':1.0} #50,
+            syn_dict={'model':'Frompyr','weight':30.0,'delay':1.0} #50,
             nest.Connect(temp_d,temp,conn_spec=conn_dict,syn_spec=syn_dict)
             nest.Connect(temp,temp_sd)
 
@@ -183,7 +183,7 @@ nest.Connect(list(source_list),list(target_list),conn_spec=conn_dict, syn_spec=s
 
 #top-down targeting layer 2/3
 
-conn_dict={'rule':'pairwise_bernoulli','p':0.05}
+conn_dict={'rule':'pairwise_bernoulli','p':0.1}
 syn_dict={'model':'Frompyr','weight':td_super_pyr,'delay':IC_delay}
 target_list=[]
 source_list=All_cells['LMl23pyr'][0]
@@ -191,7 +191,7 @@ target_list.extend(All_cells['V1_1l23pyr'][0])
 target_list.extend(All_cells['V1_2l23pyr'][0])
 nest.Connect(list(source_list),list(target_list),conn_spec=conn_dict, syn_spec=syn_dict)
 
-conn_dict={'rule':'pairwise_bernoulli','p':0.05}
+conn_dict={'rule':'pairwise_bernoulli','p':0.1}
 syn_dict={'model':'Frompyr','weight':td_super_pv,'delay':IC_delay}
 target_list=[]
 source_list=All_cells['LMl23pyr'][0]
