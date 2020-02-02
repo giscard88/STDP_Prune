@@ -101,8 +101,8 @@ Ext={'V1l23pyr':15.0,'V1l23pv':15.0,
 
 
 #probabiilty
-P_pref_pref_pyr=0.12
-P_pref_pref_pv=0.12
+P_pref_pref_pyr=0.1
+P_pref_pref_pv=0.1
 P_td_pyr=0.04
 P_td_pv=0.04
 
@@ -118,8 +118,8 @@ w_bu_pv=12.0
 #top-down weights
 
 
-td_super_pyr=4.0 #6.0
-td_super_pv=5. #10.0
+td_super_pyr=6.0 #6.0
+td_super_pv=10.0 #10.0
 
 #td_deep_pv=10.0
 
