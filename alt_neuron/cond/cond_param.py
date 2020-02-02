@@ -66,36 +66,33 @@ Neuron_nums={'l23pyr':pyr23_num,'l23pv':pv23_num,
 
 
 
-w_scale=0.1
-p_scale=0.5
-
 
 layers=['l23','l4']
 
 #within layer
-P_l23_l23={'pyr_pyr':0.1,'pyr_pv':0.6,'pv_pv':0.6,'pv_pyr':0.6}
-P_l4_l4 = {'pyr_pyr':0.1,'pyr_pv':0.6,'pv_pv':0.6,'pv_pyr':0.6}
+P_l23_l23={'pyr_pyr':0.05,'pyr_pv':0.5,'pv_pv':0.5,'pv_pyr':0.8}
+P_l4_l4 = {'pyr_pyr':0.05,'pyr_pv':0.5,'pv_pv':0.5,'pv_pyr':0.8}
 
 #across later
 P_l23_l4={'pyr_pyr':0.0,'pyr_pv':0.0,'pv_pv':0.0,'pv_pyr':0.0}
-P_l4_l23={'pyr_pyr':0.6,'pyr_pv':0.2,'pv_pv':0.0,'pv_pyr':0.0}
+P_l4_l23={'pyr_pyr':0.4,'pyr_pv':0.2,'pv_pv':0.0,'pv_pyr':0.0}
 
 
 
 P_conn={'l23_l23':P_l23_l23, 'l23_l4':P_l23_l4, 'l4_l23':P_l4_l23, 'l4_l4':P_l4_l4}
 
-V1_weights={'pyr_pyr':5.0,'pyr_pv':12.0,'pv_pyr':-12.0,'pv_pv':-12.0}
-V1_exceptions={'l4pyr_l23pyr':10.0, 'l4pyr_l23pv':5.0} 
+V1_weights={'pyr_pyr':2.0,'pyr_pv':10.0,'pv_pyr':-12.0,'pv_pv':-8.0}
+V1_exceptions={'l4pyr_l23pyr':4.0, 'l4pyr_l23pv':2.0} 
 
 LM_weights=V1_weights
-LM_exceptions=V1_exceptions
+LM_exceptions={'l4pyr_l23pyr':3.0, 'l4pyr_l23pv':3.0,'l4pv_l4pyr':-15.0,'l4pv_l4pv':-2.0} 
 
 
-Ext={'V1l23pyr':100.0,'V1l23pv':100.0,
-     'V1l4pyr':100.0,'V1l4pv':100.0, 
+Ext={'V1l23pyr':15.0,'V1l23pv':15.0,
+     'V1l4pyr':15.0,'V1l4pv':15.0, 
      
-     'LMl23pyr':100.0,'LMl23pv':100.0,
-     'LMl4pyr':100.0,'LMl4pv':100.0,
+     'LMl23pyr':25.0,'LMl23pv':25.0,
+     'LMl4pyr':25.0,'LMl4pv':25.0,
      }
 
 
@@ -104,8 +101,10 @@ Ext={'V1l23pyr':100.0,'V1l23pv':100.0,
 
 
 #probabiilty
-P_pref_pref_pyr=0.0
-P_pref_pref_pv=0.0
+P_pref_pref_pyr=0.12
+P_pref_pref_pv=0.12
+P_td_pyr=0.04
+P_td_pv=0.04
 
 
 #lgn inputs
@@ -113,12 +112,14 @@ w_lgn_pyr=20.0
 w_lgn_pv=10.0
 
 
-w_bu_pyr=5.0
-w_bu_pv=10.0
+w_bu_pyr=10.0
+w_bu_pv=12.0
 
 #top-down weights
-td_super_pyr=0.0
-td_super_pv=0.0
+
+
+td_super_pyr=4.0 #6.0
+td_super_pv=5. #10.0
 
 #td_deep_pv=10.0
 
