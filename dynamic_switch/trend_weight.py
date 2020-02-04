@@ -10,7 +10,7 @@ w_bu_pyr=40.0
 
 parser = argparse.ArgumentParser(description='readout weghts from simulation results')
 
-parser.add_argument("--var", type=str, default='top_down_pyr',
+parser.add_argument("--var", type=str, default='sst',
                         help="bottom-up connection changes w.r.t. X (default: top_down_pyr")
 
 parser.add_argument("--top_down_pv", type=float, default=1.0,
@@ -56,20 +56,20 @@ for xin in test:
     for yin in msd:
         if axis=='sst':
              
-             fn_comm=str(xin)+'_'+str(top_down_pv)+'_'+str(yin)+'_'+str(fraction)+'_'+str(sst_i)+'_0.0_'+sim_len+'.json'
+             fn_comm=str(top_down_pyr)+'_'+str(top_down_pv)+'_'+str(yin)+'_'+str(fraction)+'_'+str(xin)+'_0.0_'+sim_len+'.json'
                 
 
 
 
         if axis=='vip':
            
-             fn_comm=str(top_down_pyr)+'_'+str(xin)+'_'+str(yin)+'_'+str(fraction)+'_1.0_'+str(vip_i)+'_'+sim_len+'.json'
+             fn_comm=str(top_down_pyr)+'_'+str(top_down_pv)+'_'+str(yin)+'_'+str(fraction)+'_1.0_'+str(xin)+'_'+sim_len+'.json'
 
 
 
 
 
-        fp=open('weights_'+fn_comm,'r')
+        fp=open('weights_switch'+fn_comm,'r')
         data=json.load(fp)
         temp=data['after_p_p']
         temp=numpy.array(temp)-w_bu_pyr
@@ -94,9 +94,9 @@ for xi, xin in enumerate(test):
     xv1.append(xi+1-0.125)
     xv2.append(xi+1+0.125)
 
-print xv1,xv2
-print y1
-print y2
+print (xv1,xv2)
+print (y1)
+print (y2)
 
 test_numpy=numpy.array(test)
 
