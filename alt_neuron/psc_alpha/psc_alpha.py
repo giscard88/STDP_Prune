@@ -50,7 +50,7 @@ for xin in celltypes:
 	nest.CopyModel('static_synapse',ModelName) # this class does not have syanpse port
 
 
-nest.CopyModel('stdp_synapse','IC')
+nest.CopyModel('stdp_synapse','IC',{'alpha':1.5})
 
 p_rate=500.0
 

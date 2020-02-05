@@ -1,7 +1,7 @@
 import pylab
 import numpy
 import json
-from multi_param import w_bu_pyr
+from dopamine_param import w_bu_pyr
 
 V1_1=[]
 V1_2=[]
@@ -19,9 +19,9 @@ else:
 
 for xin in range(1,21):
     if sel_pop==1:
-        fp=open('weights_multi1.0_1.0_'+str(xin)+'_0.2_'+v1+'_'+v2+'20000.json','r')
+        fp=open('weights_multi_dopamine2-1-1.0_1.0_'+str(xin)+'_0.2_20000.json','r')
     else:
-        fp=open('model2_weights_multi1.0_1.0_'+str(xin)+'_0.2_'+v1+'_'+v2+'20000.json','r') 
+        fp=open('weights_multi_dopamine-2-1.0_1.0_'+str(xin)+'_0.2_20000.json','r') 
     data=json.load(fp)
     fp.close()
     temp=data['after_p_p']

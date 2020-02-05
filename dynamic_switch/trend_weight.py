@@ -39,11 +39,14 @@ fraction=args.second_lgn
 axis=args.var
 
 
-test=[0.0,0.2,0.4,0.6,0.8,1.0]
+
 msd=range(1,21)
 
 
-
+if axis=='sst':
+    test=[0.65, 0.75, 0.8, 0.85, 0.9, 0.95, 1.0]
+elif axis=='vip':
+    test=[0.92, 0.94, 0.96, 0.98, 1.0]     
 
 
 
@@ -57,7 +60,7 @@ for xin in test:
         if axis=='sst':
              
              fn_comm=str(top_down_pyr)+'_'+str(top_down_pv)+'_'+str(yin)+'_'+str(fraction)+'_'+str(xin)+'_0.0_'+sim_len+'.json'
-                
+               
 
 
 
@@ -118,7 +121,7 @@ if axis=='second_lgn':
     print (p)
     
 
-pylab.savefig(axis+'_'+str(args.top_down_pyr)+'_'+str(args.top_down_pv)+'_'+str(args.second_lgn)+'.eps')
+pylab.savefig('/home/jung/revision/figures/'+axis+'_'+str(args.top_down_pyr)+'_'+str(args.top_down_pv)+'_'+str(args.second_lgn)+'.eps')
 pylab.show()    
      
 
