@@ -31,15 +31,17 @@ for xin in range(1,21):
 
 xv=range(2,42,2)
 xv=numpy.array(xv)
-xv1=xv-0.5
-xv2=xv+0.5
+xv1=xv-0.25
+xv2=xv+0.25
 
 
-pylab.bar(xv1,reference_p_p,label='pref')
+pylab.bar(xv1,reference_p_p,width=0.5,label='pref')
 pylab.errorbar(xv1,reference_p_p,fmt='+',yerr=reference_p_p_err)
 
-pylab.bar(xv2,reference_np_p,label='nonpref')
+pylab.bar(xv2,reference_np_p,width=0.5,label='nonpref')
 pylab.errorbar(xv2,reference_np_p,fmt='+',yerr=reference_np_p_err)
+pylab.xticks([2,20,40],['1','10','20'])
+
 
 
 
